@@ -1,0 +1,35 @@
+Description
+=======================
+
+RPN calculator. Thanks to Kernighan and Ritchie.
+
+
+Install
+=======================
+
+  shell> cc -o rpn -static main.c stack.c getop.c mathfnc.c -lm
+
+
+Usage
+=======================
+The 2 in the power of 5 (equals to 32):
+
+  shell> rpn 2 5 pow
+
+Remember 3 as letter A (available letter from A to Z):
+  shell> rpn 3 A = 
+
+Using letters:
+  3 as A, then 5 + 4 and finally 9 * A; equals to (5 + 4) * 3 = 27
+  shell> rpn 3 A = 5 4 + A \*
+
+
+Math functions
+=======================
+
+  * Algebra: + - * / (escape * as \*)
+  * Exponent: exp
+  * n in the power: pow
+  * Geometria: sin, cos, tan
+
+See mathfnc.c for details.
