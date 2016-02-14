@@ -1,31 +1,31 @@
 .PHONY: all clean help install
 
-CFLAGS  ?= -Wall -Wextra -std=c99 -pedantic -static
+CFLAGS  ?= -Wall -Wextra -std=c89 -pedantic -static
 INSTALL ?= install
 MKDIR	?= mkdir
 STRIP	?= strip --strip-unneeded -R .comment -R .note -R .note.ABI-tag
 DESTDIR ?= /usr/local
 BINDIR  ?= $(DESTDIR)/bin
 
-SOURCES	 = $(wildcard *.c)
-PROGRAMS = $(patsubst %.c,%,$(SOURCES))
+SOURCES	= $(wildcard *.c)
+PROGRAM = rpn
 
-all: $(PROGRAMS)
+all: $(PROGRAM)
 
-$(PROGRAMS):
-	$(CC) $(CFLAGS) -o $@ $@.c
+$(PROGRAM):
+	$(CC) $(CFLAGS) -o $@ $(SOURCES)
 
 clean:
-	-$(RM) $(PROGRAMS)
+	-$(RM) $(PROGRAM)
 	
 .SILENT: help
 help:
-	echo targets: all check clean install $(PROGRAMS)
+	echo targets: all check clean install $(PROGRAM)
 
-install: $(PROGRAMS)
+install: $(PROGRAM)
 	$(MKDIR) -p $(BINDIR)
-	$(STRIP) $(PROGRAMS)
-	$(INSTALL) -m 755 $(PROGRAMS) $(BINDIR)
+	$(STRIP) $(PROGRAM)
+	$(INSTALL) -m 755 $(PROGRAM) $(BINDIR)
 
 # jff
 BADFUNCS='[^_.>a-zA-Z0-9](str(n?cpy|n?cat|xfrm|n?dup|str|pbrk|tok|_)|stpn?cpy|a?sn?printf|byte_)'
