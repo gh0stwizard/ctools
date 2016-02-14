@@ -1,4 +1,6 @@
 #include <math.h>
+#include <string.h>
+#include <stdio.h>
 
 void
 mathfnc (const char s[])
@@ -20,5 +22,5 @@ mathfnc (const char s[])
                 push (pow (pop (), op2));
         }
         else
-                printf ("error: %s is unsupported\n", s);
+                fprintf (stderr, "error: %s is unsupported\n", s);
 }

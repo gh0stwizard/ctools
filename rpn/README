@@ -7,7 +7,8 @@ RPN calculator. Thanks to Kernighan and Ritchie.
 Install
 =======================
 
-  shell> cc -o rpn -static main.c stack.c getop.c mathfnc.c -lm
+  shell> make install DESTDIR=/opt
+  shell> /opt/bin/rpn 2 2 +
 
 
 Usage

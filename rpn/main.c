@@ -8,7 +8,7 @@ int
 main (int argc, char *argv[])
 {
         int i, type, var = 0;
-        double op1, op2, v;
+        double op1, op2;
         double variable[26];
         char *s;
 
@@ -78,8 +78,6 @@ main (int argc, char *argv[])
                 default:
                         if (type >= 'A' && type <= 'Z')
                                 push (variable[type - 'A']);
-                        else if (type == 'v')
-                                push (v);
                         else
                                 printf ("error: unknown command %s (%c)\n", s, type);
                         break;
