@@ -1,5 +1,8 @@
 .PHONY: all clean help install
 
+OPTIONS ?= -DUSE_POW
+LDFLAGS ?= -lm
+
 CFLAGS  ?= -Wall -Wextra -std=c99 -pedantic -static
 INSTALL ?= install
 MKDIR	?= mkdir
@@ -14,6 +17,9 @@ all: $(PROGRAMS)
 
 $(PROGRAMS):
 	$(CC) $(CFLAGS) -o $@ $@.c
+
+pow:
+	$(CC) $(CFLAGS) ${OPTIONS} -o $@ $@.c $(LDFLAGS)
 
 clean:
 	-$(RM) $(PROGRAMS)

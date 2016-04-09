@@ -1,5 +1,7 @@
 .PHONY: all clean help install
 
+LDFLAGS ?= -lm
+
 CFLAGS  ?= -Wall -Wextra -std=c89 -pedantic -static
 INSTALL ?= install
 MKDIR	?= mkdir
@@ -13,7 +15,7 @@ PROGRAM = rpn
 all: $(PROGRAM)
 
 $(PROGRAM):
-	$(CC) $(CFLAGS) -o $@ $(SOURCES)
+	$(CC) $(CFLAGS) -o $@ $(SOURCES) ${LDFLAGS}
 
 clean:
 	-$(RM) $(PROGRAM)
