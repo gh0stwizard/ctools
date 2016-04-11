@@ -8,3 +8,7 @@ List of small, useful (IMHO) programs while I'm learning C language:
 * revnum.c      - prints a number in reverse
 * loadavg.c     - prints system load average
 * sod.c         - prints shared object dependencies
+
+
+Part of code sources has been taken from famous sources, like K&R with and 
+without changes. So, yep, there is nothing new :-P
