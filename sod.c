@@ -25,7 +25,11 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+#if defined(__linux__)
+#define _BSD_SOURCE
+#else
 #include <sys/cdefs.h>
+#endif
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
@@ -50,6 +54,137 @@
 #define	elf_get_addr    elf_get_quad
 #define	elf_get_off     elf_get_quad
 #define	elf_get_size    elf_get_quad
+
+
+#if defined(__linux__)
+/*
+ * Note header.  The ".note" section contains an array of notes.  Each
+ * begins with this header, aligned to a word boundary.  Immediately
+ * following the note header is n_namesz bytes of name, padded to the
+ * next word boundary.  Then comes n_descsz bytes of descriptor, again
+ * padded to a word boundary.  The values of n_namesz and n_descsz do
+ * not include the padding.
+ */
+typedef struct {
+    u_int32_t   n_namesz;   /* Length of name. */
+    u_int32_t   n_descsz;   /* Length of descriptor. */
+    u_int32_t   n_type;     /* Type of this note. */
+} Elf_Note;
+
+/* e_ident */
+#define IS_ELF(ehdr)    ((ehdr).e_ident[EI_MAG0] == ELFMAG0 && \
+             (ehdr).e_ident[EI_MAG1] == ELFMAG1 && \
+             (ehdr).e_ident[EI_MAG2] == ELFMAG2 && \
+             (ehdr).e_ident[EI_MAG3] == ELFMAG3)
+
+/* Alignment-agnostic encode/decode bytestream to/from little/big endian. */
+
+static __inline uint16_t
+be16dec(const void *pp)
+{
+	uint8_t const *p = (uint8_t const *)pp;
+
+	return ((p[0] << 8) | p[1]);
+}
+
+static __inline uint32_t
+be32dec(const void *pp)
+{
+	uint8_t const *p = (uint8_t const *)pp;
+
+	return (((unsigned)p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3]);
+}
+
+static __inline uint64_t
+be64dec(const void *pp)
+{
+	uint8_t const *p = (uint8_t const *)pp;
+
+	return (((uint64_t)be32dec(p) << 32) | be32dec(p + 4));
+}
+
+static __inline uint16_t
+le16dec(const void *pp)
+{
+	uint8_t const *p = (uint8_t const *)pp;
+
+	return ((p[1] << 8) | p[0]);
+}
+
+static __inline uint32_t
+le32dec(const void *pp)
+{
+	uint8_t const *p = (uint8_t const *)pp;
+
+	return (((unsigned)p[3] << 24) | (p[2] << 16) | (p[1] << 8) | p[0]);
+}
+
+static __inline uint64_t
+le64dec(const void *pp)
+{
+	uint8_t const *p = (uint8_t const *)pp;
+
+	return (((uint64_t)le32dec(p + 4) << 32) | le32dec(p));
+}
+
+static __inline void
+be16enc(void *pp, uint16_t u)
+{
+	uint8_t *p = (uint8_t *)pp;
+
+	p[0] = (u >> 8) & 0xff;
+	p[1] = u & 0xff;
+}
+
+static __inline void
+be32enc(void *pp, uint32_t u)
+{
+	uint8_t *p = (uint8_t *)pp;
+
+	p[0] = (u >> 24) & 0xff;
+	p[1] = (u >> 16) & 0xff;
+	p[2] = (u >> 8) & 0xff;
+	p[3] = u & 0xff;
+}
+
+static __inline void
+be64enc(void *pp, uint64_t u)
+{
+	uint8_t *p = (uint8_t *)pp;
+
+	be32enc(p, (uint32_t)(u >> 32));
+	be32enc(p + 4, (uint32_t)(u & 0xffffffffU));
+}
+
+static __inline void
+le16enc(void *pp, uint16_t u)
+{
+	uint8_t *p = (uint8_t *)pp;
+
+	p[0] = u & 0xff;
+	p[1] = (u >> 8) & 0xff;
+}
+
+static __inline void
+le32enc(void *pp, uint32_t u)
+{
+	uint8_t *p = (uint8_t *)pp;
+
+	p[0] = u & 0xff;
+	p[1] = (u >> 8) & 0xff;
+	p[2] = (u >> 16) & 0xff;
+	p[3] = (u >> 24) & 0xff;
+}
+
+static __inline void
+le64enc(void *pp, uint64_t u)
+{
+	uint8_t *p = (uint8_t *)pp;
+
+	le32enc(p, (uint32_t)(u & 0xffffffffU));
+	le32enc(p + 4, (uint32_t)(u >> 32));
+}
+#endif
 
 enum elf_member {
 	D_TAG = 1, D_PTR, D_VAL,
@@ -208,10 +343,7 @@ main (int argc, char *argv[])
     int i;
     struct stat sb;
 
-    u_int64_t phoff;
     u_int64_t shoff;
-    u_int64_t phentsize;
-    u_int64_t phnum;
     u_int64_t shentsize;
     u_int64_t shnum;
     u_int64_t shstrndx;
@@ -219,7 +351,6 @@ main (int argc, char *argv[])
     u_int64_t name;
     u_int64_t type;
 
-	void *p;
 	void *sh;
 	void *v;
 
@@ -238,12 +369,8 @@ main (int argc, char *argv[])
     if (!IS_ELF(*(Elf32_Ehdr *)e))
         errx (1, "not an elf file");
 
-	phoff = elf_get_off(e, e, E_PHOFF);
 	shoff = elf_get_off(e, e, E_SHOFF);
-	phentsize = elf_get_quarter(e, e, E_PHENTSIZE);
-	phnum = elf_get_quarter(e, e, E_PHNUM);
 	shentsize = elf_get_quarter(e, e, E_SHENTSIZE);
-	p = (char *)e + phoff;
 
 	if (shoff > 0) {
 		sh = (char *)e + shoff;
@@ -285,7 +412,7 @@ elf_print_dynamic(Elf32_Ehdr *e, void *sh)
 	u_int64_t entsize;
 	u_int64_t size;
 	int64_t tag;
-	u_int64_t ptr;
+/*	u_int64_t ptr;*/
 	u_int64_t val;
 	void *d;
 	int i;
@@ -297,7 +424,7 @@ elf_print_dynamic(Elf32_Ehdr *e, void *sh)
 	for (i = 0; (u_int64_t)i < size / entsize; i++) {
 		d = (char *)e + offset + i * entsize;
 		tag = elf_get_size (e, d, D_TAG);
-		ptr = elf_get_size (e, d, D_PTR);
+/*		ptr = elf_get_size (e, d, D_PTR);*/
 		val = elf_get_addr (e, d, D_VAL);
         if (tag == DT_NEEDED)
             fprintf (stdout, "%s\n", dynstr + val);
