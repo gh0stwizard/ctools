@@ -1,9 +1,10 @@
-List of small, useful (IMO) programs while I'm learning C language:
+List of small, useful (IMHO) programs while I'm learning C language:
 
-* days.c	- counts days between two dates
-* htoi.c	- converts hex number into decimal integer
-* numconv.c	- converts decimal number into another with base between 2
+* days.c        - counts days between two dates
+* htoi.c        - converts hex number into decimal integer
+* numconv.c     - converts decimal number into another with base between 2
                   and 16
-* pow.c		- raises a number to the choosen power
-* revnum.c 	- prints a number in reverse
-* loadavg.c	- prints system load average
+* pow.c         - raises a number to the choosen power
+* revnum.c      - prints a number in reverse
+* loadavg.c     - prints system load average
+* sod.c         - prints shared object dependencies

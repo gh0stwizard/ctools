@@ -9,13 +9,12 @@ MKDIR	?= mkdir
 STRIP	?= strip --strip-unneeded -R .comment -R .note -R .note.ABI-tag
 DESTDIR ?= /usr/local
 BINDIR  ?= $(DESTDIR)/bin
-
 SOURCES	 = $(wildcard *.c)
 PROGRAMS = $(patsubst %.c,%,$(SOURCES))
 
 all: $(PROGRAMS)
 
-$(PROGRAMS):
+revnum sod htoi loadavg days numconv:
 	$(CC) $(CFLAGS) -o $@ $@.c
 
 pow:
