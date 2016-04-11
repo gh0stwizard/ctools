@@ -57,6 +57,12 @@
 
 
 #if defined(__linux__)
+/* 
+ * next part taken from FreeBSD: /usr/include/sys/elf_common.h
+ * Copyright (c) 2000, 2001, 2008, 2011, David E. O'Brien
+ * Copyright (c) 1998 John D. Polstra.
+ */
+
 /*
  * Note header.  The ".note" section contains an array of notes.  Each
  * begins with this header, aligned to a word boundary.  Immediately
@@ -76,6 +82,11 @@ typedef struct {
              (ehdr).e_ident[EI_MAG1] == ELFMAG1 && \
              (ehdr).e_ident[EI_MAG2] == ELFMAG2 && \
              (ehdr).e_ident[EI_MAG3] == ELFMAG3)
+
+/*
+ * next part taken from FreeBSD: /usr/include/sys/endian.h
+ * Copyright (c) 2002 Thomas Moestl <tmm@FreeBSD.org>
+ */
 
 /* Alignment-agnostic encode/decode bytestream to/from little/big endian. */
 
