@@ -1,3 +1,7 @@
+#ifdef __linux__
+#define _BSD_SOURCE
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 
