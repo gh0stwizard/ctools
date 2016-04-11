@@ -1,4 +1,4 @@
-List of small useful, IMO, programs while I'm learning C language:
+List of small, useful (IMO) programs while I'm learning C language:
 
 * days.c	- counts days between two dates
 * htoi.c	- converts hex number into decimal integer
@@ -6,3 +6,4 @@ List of small useful, IMO, programs while I'm learning C language:
 and 16
 * pow.c		- raises a number to the choosen power
 * revnum.c 	- prints a number in reverse
+* loadavg.c	- prints system load average
