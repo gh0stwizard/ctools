@@ -39,6 +39,9 @@
 #include <sys/elf32.h>
 #include <sys/elf64.h>
 #include <sys/endian.h>
+#elif defined(__NetBSD__)
+#include <libelf.h>
+#include <sys/endian.h>
 #else
 #error unsupported OS
 #endif
@@ -195,6 +198,23 @@ le64enc(void *pp, uint64_t u)
 	le32enc(p, (uint32_t)(u & 0xffffffffU));
 	le32enc(p + 4, (uint32_t)(u >> 32));
 }
+#endif
+
+/*
+ * Tested on NetBSD 9.0
+ */
+#ifdef __NetBSD__
+typedef struct {
+    u_int32_t   n_namesz;   /* Length of name. */
+    u_int32_t   n_descsz;   /* Length of descriptor. */
+    u_int32_t   n_type;     /* Type of this note. */
+} Elf_Note;
+
+/* e_ident */
+#define IS_ELF(ehdr)    ((ehdr).e_ident[EI_MAG0] == ELFMAG0 && \
+             (ehdr).e_ident[EI_MAG1] == ELFMAG1 && \
+             (ehdr).e_ident[EI_MAG2] == ELFMAG2 && \
+             (ehdr).e_ident[EI_MAG3] == ELFMAG3)
 #endif
 
 enum elf_member {
@@ -377,8 +397,9 @@ main (int argc, char *argv[])
     if (e == MAP_FAILED)
         err (1, "mmap");
 
-    if (!IS_ELF(*(Elf32_Ehdr *)e))
+    if (!IS_ELF(*(Elf32_Ehdr *)e)) {
         errx (1, "not an elf file");
+    }
 
 	shoff = elf_get_off(e, e, E_SHOFF);
 	shentsize = elf_get_quarter(e, e, E_SHENTSIZE);

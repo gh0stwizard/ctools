@@ -27,16 +27,17 @@ getop (char s[])
 
         if (*c == '-')
                 c++;
-                if (isdigit (*c) || *c == '.')
-                        c++; /* отрицательное число */
-                else
-                        return '-'; /* знак минус */
+
+        if (isdigit (*c) || *c == '.')
+                c++; /* отрицательное число */
+        else
+                return '-'; /* знак минус */
 
         if (isdigit (*c)) /* накопление целой части */
-                while (isdigit (*++c))
-                        ;
+                while (isdigit (*++c));
+
         if (*c == '.') /* накопление дробной части */
-                while (isdigit (*++c))
-                        ;
+                while (isdigit (*++c));
+
         return NUMBER;
 }
