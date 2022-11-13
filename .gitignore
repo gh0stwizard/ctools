@@ -7,3 +7,5 @@ pow
 revnum
 loadavg
 sod
+colorizer/colorizer
+*.o
